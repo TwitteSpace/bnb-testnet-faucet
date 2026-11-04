@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ---- Safety constants (deliberately NOT configurable through .env) ----
-const AMOUNT = '0.3';            // max tBNB per request
+const AMOUNT = '0.01';           // max tBNB per request
 const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 1 claim per 24 h per address and per IP
 const CHAIN_ID = 97;             // BSC Testnet only
 const MAINNET_CHAIN_ID = 56;     // BSC Mainnet, read-only: used to check the requester's balance
@@ -45,7 +45,7 @@ if (mainnetNetwork.chainId !== BigInt(MAINNET_CHAIN_ID)) {
   process.exit(1);
 }
 
-// ---- Claim storage (max 0.3 tBNB per address AND per IP every 24 h) ----
+// ---- Claim storage (max 0.01 tBNB per address AND per IP every 24 h) ----
 fs.mkdirSync(path.dirname(CLAIMS_FILE), { recursive: true });
 let claims = { addresses: {}, ips: {} };
 if (fs.existsSync(CLAIMS_FILE)) claims = JSON.parse(fs.readFileSync(CLAIMS_FILE, 'utf8'));
@@ -93,7 +93,7 @@ app.post('/api/claim', (req, res) => {
     const waitMs = Math.max(remaining(claims.addresses[key]), remaining(claims.ips[ip]));
     if (waitMs > 0) {
       const h = Math.ceil(waitMs / 3600000);
-      return res.status(429).json({ error: `Limit reached: 0.3 tBNB per 24 h. Try again in about ${h} h.` });
+      return res.status(429).json({ error: `Limit reached: ${AMOUNT} tBNB per 24 h. Try again in about ${h} h.` });
     }
     if (key === wallet.address.toLowerCase()) {
       return res.status(400).json({ error: 'The faucet address is not allowed' });

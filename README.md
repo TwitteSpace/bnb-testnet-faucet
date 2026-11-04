@@ -1,6 +1,6 @@
 # BNB Testnet Faucet
 
-A small faucet that sends 0.3 tBNB on BSC Testnet (chain ID 97) to any address. One claim per address and per IP every 24 hours.
+A small faucet that sends 0.01 tBNB on BSC Testnet (chain ID 97) to any address. One claim per address and per IP every 24 hours.
 
 ## Run it
 

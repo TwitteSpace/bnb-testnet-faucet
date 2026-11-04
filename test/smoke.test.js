@@ -26,7 +26,7 @@ test('GET /api/info returns the faucet address and the claim amount', async () =
   const res = await fetch(`${BASE}/api/info`);
   assert.equal(res.status, 200);
   const body = await res.json();
-  assert.equal(body.amount, '0.3');
+  assert.equal(body.amount, '0.01');
   assert.equal(body.minMainnetBnb, '0.002');
   assert.ok(ethers.isAddress(body.faucetAddress));
 });
