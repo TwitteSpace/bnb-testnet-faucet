@@ -2,15 +2,6 @@
 
 A small faucet that sends 0.01 tBNB on BSC Testnet (chain ID 97) to any address. One claim per address and per IP every 24 hours.
 
-## Run it
-
-```bash
-cp .env.example .env     # then add the key of a dedicated testnet wallet
-npm install
-npm start
-```
-
-Open http://localhost:3000.
 
 ## Safety
 
