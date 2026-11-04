@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BNB Testnet Faucet</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 12vh auto; padding: 0 16px; }
+  input, button { width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box; margin-top: 8px; }
+  button { cursor: pointer; }
+  #msg { margin-top: 16px; word-break: break-all; }
+  .err { color: #b00020; } .ok { color: #1b7a2b; }
+  small { color: #666; }
+</style>
+</head>
+<body>
+  <h1>BNB Testnet Faucet</h1>
+  <p>Reçois <b id="amount">0.3</b> tBNB (BSC Testnet) — <b>une fois toutes les 24 h</b> par adresse.</p>
+  <input id="addr" placeholder="0x..." autocomplete="off" spellcheck="false">
+  <button id="btn">Réclamer</button>
+  <div id="msg"></div>
+  <p><small id="info"></small></p>
+<script>
+const $ = (id) => document.getElementById(id);
+const msg = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = cls; };
+
+fetch('/api/info').then(r => r.json()).then(i => {
+  if (i.amount) $('amount').textContent = i.amount;
+  if (i.balance) $('info').textContent = `Solde du faucet : ${Number(i.balance).toFixed(2)} tBNB`;
+}).catch(() => {});
+
+$('btn').onclick = async () => {
+  const address = $('addr').value.trim();
+  $('btn').disabled = true;
+  msg('Envoi en cours…', '');
+  try {
+    const r = await fetch('/api/claim', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erreur');
+    msg('', '');
+    const m = $('msg'); m.className = 'ok';
+    m.append(`${d.amount} tBNB envoyés. `);
+    const a = document.createElement('a');
+    a.href = 'https://testnet.bscscan.com/tx/' + d.txHash;
+    a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = 'Voir la transaction';
+    m.append(a);
+  } catch (e) {
+    msg(e.message, 'err');
+  } finally {
+    $('btn').disabled = false;
+  }
+};
+</script>
+</body>
+</html>
