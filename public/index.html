@@ -46,14 +46,6 @@
   .note p { margin: 0 0 10px; line-height: 1.5; font-size: 15px; }
   .note .sign { margin: 0; color: var(--muted); font-size: 14px; }
 
-  .faq details { border-top: 1px solid var(--line); padding: 14px 0; }
-  .faq details:last-child { border-bottom: 1px solid var(--line); }
-  .faq summary { cursor: pointer; list-style: none; display: flex; gap: 16px; font-size: 15px; }
-  .faq summary::-webkit-details-marker { display: none; }
-  .faq summary i { font-style: normal; color: var(--muted); }
-  .faq summary::after { content: "+"; margin-left: auto; color: var(--muted); }
-  .faq details[open] summary::after { content: "\2212"; }
-  .faq p { margin: 10px 0 0 34px; color: var(--muted); font-size: 14px; line-height: 1.5; }
 
   footer { max-width: 720px; margin: 0 auto; padding: 8px 16px 48px; color: var(--muted); font-size: 12px; text-align: center; line-height: 1.6; }
   @media (max-width: 560px) { .row { grid-template-columns: 1fr; } .note { flex-direction: column; text-align: center; } }
@@ -93,15 +85,6 @@
       </div>
     </section>
 
-    <section class="card faq">
-      <h2>FAQ</h2>
-      <details><summary><i>01</i> What standard are these tokens issued in?</summary><p>This faucet sends native tBNB on BSC Testnet (chain ID 97). It does not send BEP20 tokens.</p></details>
-      <details><summary><i>02</i> Are there any rate limits?</summary><p>Yes. One claim of 0.3 tBNB every 24 hours, per address and per IP.</p></details>
-      <details><summary><i>03</i> What if I want to request a large amount of tokens?</summary><p>This demo only sends 0.3 tBNB. For larger amounts, use the official BNB Chain testnet faucet.</p></details>
-      <details><summary><i>04</i> Do you support other tokens?</summary><p>No. Only tBNB.</p></details>
-      <details><summary><i>05</i> Does tBNB have any value?</summary><p>No. It is for testing only and cannot be traded.</p></details>
-      <details><summary><i>06</i> What if my request keeps failing?</summary><p>Check that the address holds at least 0.002 BNB on BSC Mainnet, then wait a few minutes and try again.</p></details>
-    </section>
   </main>
   <footer>
     Independent demo project by Gopina Nadji Rex. Not an official BNB Chain product.<br>
