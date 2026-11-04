@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,9 +15,9 @@
 </head>
 <body>
   <h1>BNB Testnet Faucet</h1>
-  <p>Reçois <b id="amount">0.3</b> tBNB (BSC Testnet) — <b>une fois toutes les 24 h</b> par adresse.<br><small>L'adresse doit détenir au moins <b id="min">0.002</b> BNB (BSC Mainnet).</small></p>
+  <p>Get <b id="amount">0.3</b> tBNB (BSC Testnet) — <b>once every 24 h</b> per address.<br><small>The address must hold at least <b id="min">0.002</b> BNB (BSC Mainnet).</small></p>
   <input id="addr" placeholder="0x..." autocomplete="off" spellcheck="false">
-  <button id="btn">Réclamer</button>
+  <button id="btn">Claim</button>
   <div id="msg"></div>
   <p><small id="info"></small></p>
 <script>
@@ -27,13 +27,13 @@ const msg = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = c
 fetch('/api/info').then(r => r.json()).then(i => {
   if (i.amount) $('amount').textContent = i.amount;
   if (i.minMainnetBnb) $('min').textContent = i.minMainnetBnb;
-  if (i.balance) $('info').textContent = `Solde du faucet : ${Number(i.balance).toFixed(2)} tBNB`;
+  if (i.balance) $('info').textContent = `Faucet balance: ${Number(i.balance).toFixed(2)} tBNB`;
 }).catch(() => {});
 
 $('btn').onclick = async () => {
   const address = $('addr').value.trim();
   $('btn').disabled = true;
-  msg('Envoi en cours…', '');
+  msg('Sending…', '');
   try {
     const r = await fetch('/api/claim', {
       method: 'POST',
@@ -41,14 +41,14 @@ $('btn').onclick = async () => {
       body: JSON.stringify({ address }),
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'Erreur');
+    if (!r.ok) throw new Error(d.error || 'Error');
     msg('', '');
     const m = $('msg'); m.className = 'ok';
-    m.append(`${d.amount} tBNB envoyés. `);
+    m.append(`${d.amount} tBNB sent. `);
     const a = document.createElement('a');
     a.href = 'https://testnet.bscscan.com/tx/' + d.txHash;
     a.target = '_blank'; a.rel = 'noopener';
-    a.textContent = 'Voir la transaction';
+    a.textContent = 'View transaction';
     m.append(a);
   } catch (e) {
     msg(e.message, 'err');
