@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file=.env server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "start:prod": "node server.js"
   },
   "engines": {
     "node": ">=20.6"

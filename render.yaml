@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: bnb-testnet-faucet
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm run start:prod
+    healthCheckPath: /api/info
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: RPC_URL
+        value: https://data-seed-prebsc-1-s1.bnbchain.org:8545
+      - key: TRUST_PROXY
+        value: "1"
+      - key: PRIVATE_KEY
+        sync: false

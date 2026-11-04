@@ -22,3 +22,7 @@ Open http://localhost:3000.
 ## CI
 
 GitHub Actions runs on every push and pull request (`.github/workflows/ci.yml`): install, syntax check, then the tests in `test/` on Node 20 and 22. The tests start the server with a throwaway key and check the API answers.
+
+## Deploy (CD)
+
+`render.yaml` describes the service for Render. After CI passes on `main`, Render deploys the new version on its own (`autoDeployTrigger: checksPass`). `PRIVATE_KEY` is set in the Render dashboard, never in the repo.
