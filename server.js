@@ -71,13 +71,8 @@ if (TRUST_PROXY) app.set('trust proxy', Number(TRUST_PROXY)); // e.g. 1 behind n
 app.use(express.json({ limit: '1kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/info', async (_req, res) => {
-  try {
-    const bal = await provider.getBalance(wallet.address);
-    res.json({ amount: AMOUNT, minMainnetBnb: MIN_MAINNET_BNB, faucetAddress: wallet.address, balance: ethers.formatEther(bal) });
-  } catch {
-    res.status(502).json({ error: 'RPC unavailable' });
-  }
+app.get('/api/info', (_req, res) => {
+  res.json({ amount: AMOUNT, minMainnetBnb: MIN_MAINNET_BNB, faucetAddress: wallet.address });
 });
 
 app.post('/api/claim', (req, res) => {

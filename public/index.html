@@ -39,7 +39,6 @@
   button#btn:disabled { background: #5c5f6a; color: rgba(24, 26, 30, .45); cursor: not-allowed; }
   #msg { margin-top: 16px; word-break: break-all; font-size: 14px; }
   .err { color: #ff6b6b; } .ok { color: #4cd964; }
-  #info { color: var(--muted); }
 
   .note { display: flex; gap: 18px; align-items: center; border-color: rgba(240, 185, 11, .45); }
   .avatar { flex: none; width: 84px; height: 84px; border-radius: 50%; border: 2px solid var(--yellow); object-fit: cover; background: #2b2e36; display: grid; place-items: center; font-family: "Zen Dots", sans-serif; font-size: 30px; color: var(--yellow); }
@@ -74,7 +73,6 @@
       </div>
       <button id="btn">Send 0.01 BNB</button>
       <div id="msg"></div>
-      <small id="info"></small>
     </section>
 
     <section class="card note">
@@ -96,7 +94,6 @@ const msg = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = c
 
 fetch('/api/info').then(r => r.json()).then(i => {
   if (i.amount) { $('tokenlabel').textContent = `${i.amount} BNB`; $('btn').textContent = `Send ${i.amount} BNB`; }
-  if (i.balance) $('info').textContent = `Faucet balance: ${Number(i.balance).toFixed(2)} tBNB`;
 }).catch(() => {});
 
 $('btn').onclick = async () => {
