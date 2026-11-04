@@ -15,7 +15,7 @@
 </head>
 <body>
   <h1>BNB Testnet Faucet</h1>
-  <p>Reçois <b id="amount">0.3</b> tBNB (BSC Testnet) — <b>une fois toutes les 24 h</b> par adresse.</p>
+  <p>Reçois <b id="amount">0.3</b> tBNB (BSC Testnet) — <b>une fois toutes les 24 h</b> par adresse.<br><small>L'adresse doit détenir au moins <b id="min">0.002</b> BNB (BSC Mainnet).</small></p>
   <input id="addr" placeholder="0x..." autocomplete="off" spellcheck="false">
   <button id="btn">Réclamer</button>
   <div id="msg"></div>
@@ -26,6 +26,7 @@ const msg = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = c
 
 fetch('/api/info').then(r => r.json()).then(i => {
   if (i.amount) $('amount').textContent = i.amount;
+  if (i.minMainnetBnb) $('min').textContent = i.minMainnetBnb;
   if (i.balance) $('info').textContent = `Solde du faucet : ${Number(i.balance).toFixed(2)} tBNB`;
 }).catch(() => {});
 

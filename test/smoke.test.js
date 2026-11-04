@@ -27,6 +27,7 @@ test('GET /api/info returns the faucet address and the claim amount', async () =
   assert.equal(res.status, 200);
   const body = await res.json();
   assert.equal(body.amount, '0.3');
+  assert.equal(body.minMainnetBnb, '0.002');
   assert.ok(ethers.isAddress(body.faucetAddress));
 });
 
@@ -48,4 +49,15 @@ test('POST /api/claim refuses the faucet\'s own address or an empty faucet', asy
   });
   // The test faucet has no tBNB, so it answers 503 (empty) or 400 (own address). Both mean no transaction is sent.
   assert.ok([400, 503].includes(res.status));
+});
+
+test('POST /api/claim refuses an address with no BNB on BSC Mainnet', async () => {
+  const res = await fetch(`${BASE}/api/claim`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ address: ethers.Wallet.createRandom().address }),
+  });
+  assert.equal(res.status, 403);
+  const body = await res.json();
+  assert.match(body.error, /0\.002 BNB/);
 });

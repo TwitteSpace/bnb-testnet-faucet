@@ -10,10 +10,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AMOUNT = '0.3';            // tBNB par requête, maximum
 const COOLDOWN_MS = 24 * 60 * 60 * 1000; // 1 claim / 24 h par adresse et par IP
 const CHAIN_ID = 97;             // BSC Testnet uniquement
+const MAINNET_CHAIN_ID = 56;     // BSC Mainnet, lecture seule : sert à vérifier le solde du demandeur
+const MIN_MAINNET_BNB = '0.002'; // le demandeur doit détenir au moins ce montant en vrai BNB
 const CLAIMS_FILE = path.join(__dirname, 'data', 'claims.json');
 
 // ---- Config via .env ----
-const { PRIVATE_KEY, RPC_URL = 'https://data-seed-prebsc-1-s1.bnbchain.org:8545', PORT = '3000', TRUST_PROXY } = process.env;
+const {
+  PRIVATE_KEY,
+  RPC_URL = 'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
+  MAINNET_RPC_URL = 'https://bsc-dataseed.bnbchain.org',
+  PORT = '3000',
+  TRUST_PROXY,
+} = process.env;
 if (!PRIVATE_KEY) {
   console.error('PRIVATE_KEY manquante (voir .env.example)');
   process.exit(1);
@@ -21,11 +29,19 @@ if (!PRIVATE_KEY) {
 
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+// Mainnet : jamais utilisé pour envoyer, uniquement pour lire le solde du demandeur
+const mainnet = new ethers.JsonRpcProvider(MAINNET_RPC_URL);
 
 // Garde-fou : refuse de démarrer si le RPC n'est pas BSC Testnet (évite d'envoyer de vrais BNB)
 const network = await provider.getNetwork();
 if (network.chainId !== BigInt(CHAIN_ID)) {
   console.error(`Mauvais réseau (chainId ${network.chainId}), attendu ${CHAIN_ID} (BSC Testnet).`);
+  process.exit(1);
+}
+
+const mainnetNetwork = await mainnet.getNetwork();
+if (mainnetNetwork.chainId !== BigInt(MAINNET_CHAIN_ID)) {
+  console.error(`MAINNET_RPC_URL pointe vers le mauvais réseau (chainId ${mainnetNetwork.chainId}), attendu ${MAINNET_CHAIN_ID} (BSC Mainnet).`);
   process.exit(1);
 }
 
@@ -58,7 +74,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/info', async (_req, res) => {
   try {
     const bal = await provider.getBalance(wallet.address);
-    res.json({ amount: AMOUNT, faucetAddress: wallet.address, balance: ethers.formatEther(bal) });
+    res.json({ amount: AMOUNT, minMainnetBnb: MIN_MAINNET_BNB, faucetAddress: wallet.address, balance: ethers.formatEther(bal) });
   } catch {
     res.status(502).json({ error: 'RPC indisponible' });
   }
@@ -81,6 +97,17 @@ app.post('/api/claim', (req, res) => {
     }
     if (key === wallet.address.toLowerCase()) {
       return res.status(400).json({ error: 'Adresse du faucet interdite' });
+    }
+
+    // Anti-farming : le demandeur doit détenir au moins 0.002 BNB réels sur BSC Mainnet
+    let mainnetBalance;
+    try {
+      mainnetBalance = await mainnet.getBalance(address);
+    } catch {
+      return res.status(502).json({ error: 'Impossible de vérifier ton solde mainnet, réessaie plus tard' });
+    }
+    if (mainnetBalance < ethers.parseEther(MIN_MAINNET_BNB)) {
+      return res.status(403).json({ error: `Il faut détenir au moins ${MIN_MAINNET_BNB} BNB (BSC Mainnet) sur cette adresse.` });
     }
 
     const value = ethers.parseEther(AMOUNT);
